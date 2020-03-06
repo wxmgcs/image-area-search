@@ -4,22 +4,30 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 
 /**
  * @author wxmgcs@gmail.com
  * @create 2020-03-06 上午11:44
  */
-public class ImageAreaSearch{
+public class ImageAreaSearch {
+    private int matchX = -1;
+    private int matchY = -1;
+
+    private void init() {
+        matchX = -1;
+        matchY = -1;
+    }
 
     /**
-     *
-     * @param srcFile 被查找的图
-     * @param searchFile 查找的区域
+     * @param srcFile               被查找的图
+     * @param searchFile            查找的区域
      * @param statisticsElapsedTime 是否统计耗时
      * @return
      * @throws IOException
      */
     boolean match(File srcFile, File searchFile, boolean statisticsElapsedTime) throws IOException {
+        init();
         long start = System.currentTimeMillis();
         boolean isMatch = match(srcFile, searchFile);
         long end = System.currentTimeMillis();
@@ -28,6 +36,22 @@ public class ImageAreaSearch{
         }
 
         return isMatch;
+    }
+
+    public boolean markArea(File srcFile, File searchFile, boolean statisticsElapsedTime) throws IOException {
+        boolean isMatch = match(srcFile, searchFile, statisticsElapsedTime);
+        if (!isMatch) {
+            return false;
+        }
+
+        BufferedImage src = ImageIO.read(srcFile);
+        BufferedImage search = ImageIO.read(searchFile);
+
+        final int[] data = src.getRGB(matchX, matchY, search.getWidth(), search.getHeight(), null, 0, search.getWidth());
+        Arrays.fill(data, 0x00000000);
+        src.setRGB(matchX, matchY, search.getWidth(), search.getHeight(), data, 0, search.getWidth());
+        ImageIO.write(src, "png", new File(srcFile.getParent(), srcFile.getName() + ".mark.png"));
+        return true;
     }
 
     /**
@@ -84,7 +108,8 @@ public class ImageAreaSearch{
 
                         if (searchPointCount == matchPointCount) {
                             isMatch = true;
-                            System.out.println("匹配到的起始坐标:(" + x + "," + y + ")");
+                            matchX = x;
+                            matchY = y;
                         }
                         searchX = 0;
                         searchY = 0;
@@ -99,6 +124,7 @@ public class ImageAreaSearch{
 
     /**
      * 匹配两个点的rgb值是否相等
+     *
      * @param rgb1
      * @param rgb2
      * @return
