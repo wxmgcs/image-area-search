@@ -35,6 +35,5 @@ public class ImageAreaSearchTest {
     @Test
     public void testMarkArea() throws IOException {
         Assert.assertTrue(areaSearch.markArea(new File(imagesPath,"2.png"),searchFile,true));
-
     }
 }
