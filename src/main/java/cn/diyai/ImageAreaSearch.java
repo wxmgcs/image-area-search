@@ -97,6 +97,12 @@ public class ImageAreaSearch{
         return isMatch;
     }
 
+    /**
+     * 匹配两个点的rgb值是否相等
+     * @param rgb1
+     * @param rgb2
+     * @return
+     */
     private boolean isEqual(int rgb1, int rgb2) {
         int[] rgbArr1 = getRGB(rgb1);
         int[] rgbArr2 = getRGB(rgb2);
